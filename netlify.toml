@@ -1,0 +1,9 @@
+[[headers]]
+  for = "/sw.js"
+  [headers.headers]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/index.html"
+  [headers.headers]
+    Cache-Control = "public, max-age=0, must-revalidate"
