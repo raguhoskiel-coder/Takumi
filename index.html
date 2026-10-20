@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
+<meta name="theme-color" content="#0a0c10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="APEX">
+<title>APEX</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230a0c10'/%3E%3Cpolygon points='256,88 401,172 401,340 256,424 111,340 111,172' fill='none' stroke='%233b82f6' stroke-width='16'/%3E%3Cpath d='M171 156L256 356L341 156' fill='none' stroke='%23f8fafc' stroke-width='30'/%3E%3Cpath d='M212 226H300' fill='none' stroke='%23f8fafc' stroke-width='30'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon-512.png">
+<style>
+:root{--bg-base:#0a0c10;--bg-panel:#12151c;--bg-card:#181c25;--border-color:#262c3a;--blue-primary:#1e3a8a;--blue-accent:#3b82f6;--blue-glow:rgba(59,130,246,.4);--red-accent:#dc2626;--text-main:#f8fafc;--text-muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-tap-highlight-color:transparent}
+input,textarea{user-select:text;-webkit-user-select:text}
+body{background:var(--bg-base);color:var(--text-main);font-family:'Rajdhani',sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden}
+#game-container{width:100%;max-width:480px;height:100vh;max-height:900px;background:var(--bg-base);display:flex;flex-direction:column;position:relative;box-shadow:0 0 40px rgba(0,0,0,.8);border:1px solid var(--border-color);overflow:hidden}
+header{background:var(--bg-panel);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color);z-index:10}
+.brand{display:flex;align-items:center;gap:9px;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:var(--blue-accent)}
+.brand-mark{width:24px;height:24px;flex:0 0 auto;filter:drop-shadow(0 0 6px var(--blue-glow))}
+.header-actions{display:flex;gap:8px;align-items:center}
+.icon-btn{background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-muted);padding:6px 10px;border-radius:4px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.8rem;cursor:pointer;transition:all .2s}
+.icon-btn:hover{border-color:var(--red-accent);color:var(--red-accent)}
+.view-content{flex:1;overflow-y:auto;padding:16px;display:none;flex-direction:column;gap:16px;padding-bottom:80px}
+.view-content.active{display:flex}
+nav{position:absolute;bottom:0;left:0;width:100%;height:65px;background:var(--bg-panel);border-top:1px solid var(--border-color);display:flex;z-index:100}
+.nav-tab{flex:1;background:none;border:none;color:var(--text-muted);font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:all .25s;position:relative}
+.nav-tab.active{color:var(--blue-accent);background:rgba(59,130,246,.05)}
+.nav-tab.active::after{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:var(--blue-accent);box-shadow:0 0 10px var(--blue-accent)}
+.rank-section{background:var(--bg-panel);border:1px solid var(--border-color);border-radius:12px;padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;overflow:hidden;box-shadow:inset 0 0 20px rgba(0,0,0,.5)}
+.badge-container{width:100px;height:100px;display:flex;justify-content:center;align-items:center;margin-bottom:12px;position:relative}
+.badge{width:70px;height:70px;display:flex;justify-content:center;align-items:center;position:relative;transition:all .5s cubic-bezier(.4,0,.2,1)}
+.badge-dot{width:16px;height:16px;background:#64748b;border-radius:50%;box-shadow:0 0 10px #64748b}
+.badge-hexagon{background:#3b82f6;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);box-shadow:0 0 15px rgba(59,130,246,.6)}
+.badge-ringed-hex{border:2px dashed #2563eb;border-radius:50%;animation:spinSlow 15s linear infinite}
+.badge-ringed-hex::after{content:'';width:45px;height:45px;background:#2563eb;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);box-shadow:0 0 15px rgba(37,99,235,.7)}
+.badge-shield{width:60px;height:75px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);box-shadow:0 0 20px rgba(29,78,216,.8)}
+.badge-glowing-shield{width:65px;height:80px;background:linear-gradient(135deg,#06b6d4,#1d4ed8);clip-path:polygon(50% 0,100% 20%,90% 80%,50% 100%,10% 80%,0 20%);box-shadow:0 0 25px #06b6d4,inset 0 0 10px #fff;animation:pulseGlow 2s ease-in-out infinite alternate}
+.badge-winged-shield{width:75px;height:75px;background:radial-gradient(circle,#dc2626 30%,#7f1d1d 90%);border-radius:50%;box-shadow:0 0 30px var(--red-accent);border:2px solid #f87171}
+.badge-winged-shield::before,.badge-winged-shield::after{content:'\25B2';position:absolute;color:#dc2626;font-size:1.2rem;text-shadow:0 0 10px #dc2626}
+.badge-winged-shield::before{left:-12px;transform:rotate(-30deg)}
+.badge-winged-shield::after{right:-12px;transform:rotate(30deg)}
+.badge-crowned{width:75px;height:75px;background:linear-gradient(135deg,#ef4444,#991b1b);clip-path:polygon(50% 15%,85% 35%,100% 85%,50% 100%,0 85%,15% 35%);box-shadow:0 0 35px #ef4444;border:2px solid #fca5a5}
+.badge-aura{width:80px;height:80px;background:radial-gradient(circle,#c084fc 20%,#7c3aed 70%,#4c1d95 100%);border-radius:50%;box-shadow:0 0 40px #8b5cf6,0 0 80px rgba(139,92,246,.5);animation:pulseGlow 1.5s ease-in-out infinite alternate}
+.badge-animated-aura{width:85px;height:85px;background:conic-gradient(from 0deg,#7c3aed,#c084fc,#3b82f6,#7c3aed);border-radius:50%;box-shadow:0 0 50px #7c3aed,inset 0 0 20px #fff;animation:spinSlow 8s linear infinite}
+.badge-ultimate{width:90px;height:90px;background:radial-gradient(circle,#f3e8ff 10%,#a855f7 50%,#581c87 90%);border-radius:50%;box-shadow:0 0 60px #c084fc,0 0 100px #7e22ce,inset 0 0 25px #fff;animation:ultimatePulse 2s ease-in-out infinite alternate;display:flex;justify-content:center;align-items:center;color:#fff;font-size:2.2rem;font-weight:700;text-shadow:0 0 15px #fff}
+@keyframes spinSlow{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+@keyframes pulseGlow{0%{transform:scale(.95);opacity:.8}100%{transform:scale(1.05);opacity:1}}
+@keyframes ultimatePulse{0%{transform:scale(.95) rotate(0);box-shadow:0 0 40px #c084fc}50%{transform:scale(1.05) rotate(180deg);box-shadow:0 0 90px #e879f9,0 0 120px #9333ea}100%{transform:scale(.95) rotate(360deg);box-shadow:0 0 40px #c084fc}}
+.rank-title{font-size:1.8rem;font-weight:700;letter-spacing:2px;margin-bottom:4px}
+.rank-desc{font-size:.9rem;color:var(--text-muted);letter-spacing:1px}
+.progress-container{width:100%;background:var(--bg-card);border:1px solid var(--border-color);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.progress-info{display:flex;justify-content:space-between;font-size:.85rem;font-weight:600;color:var(--text-muted)}
+.progress-bar-bg{width:100%;height:8px;background:var(--bg-base);border-radius:4px;overflow:hidden;border:1px solid var(--border-color)}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue-primary),var(--blue-accent));width:0;transition:width .4s cubic-bezier(.4,0,.2,1);box-shadow:0 0 10px var(--blue-glow)}
+.score-display-card{background:var(--bg-panel);border:1px solid var(--border-color);border-radius:12px;padding:24px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 30px rgba(0,0,0,.6)}
+.score-label{font-size:.85rem;letter-spacing:2px;color:var(--text-muted);margin-bottom:8px;font-weight:600}
+.score-number{font-size:3.5rem;font-weight:700;color:var(--blue-accent);text-shadow:0 0 25px var(--blue-glow);line-height:1;margin-bottom:8px}
+.reps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%}
+.rep-btn{background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-main);padding:14px 0;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .15s;box-shadow:0 4px 6px rgba(0,0,0,.2)}
+.rep-btn:hover{border-color:var(--blue-accent);background:rgba(59,130,246,.1);color:var(--blue-accent)}
+.rep-btn:active{transform:scale(.95)}
+.custom-rep-box{display:flex;gap:8px;width:100%}
+.custom-input{flex:1;background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:0 16px;color:var(--text-main);font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:600;outline:none;transition:border-color .2s}
+.custom-input:focus{border-color:var(--blue-accent)}
+.custom-submit{background:var(--blue-primary);border:1px solid var(--blue-accent);color:var(--text-main);padding:12px 20px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
+.custom-submit:hover{background:var(--blue-accent);box-shadow:0 0 15px var(--blue-glow)}
+.utak-header{background:var(--bg-panel);border:1px solid var(--border-color);border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.utak-mode-title{font-weight:700;font-size:1rem;letter-spacing:1px;color:var(--blue-accent)}
+.lesson-card,.scenario-card{background:var(--bg-panel);border:1px solid var(--border-color);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.lesson-meta{font-size:.8rem;color:var(--red-accent);font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+.lesson-title{font-size:1.3rem;font-weight:700;color:var(--text-main);line-height:1.2}
+.lesson-body{font-size:1rem;color:var(--text-muted);line-height:1.5}
+.action-btn{background:var(--blue-primary);border:1px solid var(--blue-accent);color:var(--text-main);padding:14px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:1px;cursor:pointer;text-align:center;transition:all .2s;box-shadow:0 4px 10px rgba(0,0,0,.3)}
+.action-btn:hover{background:var(--blue-accent);box-shadow:0 0 15px var(--blue-glow)}
+.scenario-text{font-size:1.05rem;color:var(--text-main);line-height:1.5;background:var(--bg-card);padding:14px;border-radius:8px;border-left:4px solid var(--blue-accent)}
+.options-container{display:flex;flex-direction:column;gap:10px}
+.option-btn{background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-main);padding:12px 16px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:600;text-align:left;cursor:pointer;transition:all .2s}
+.option-btn:hover{border-color:var(--blue-accent);background:rgba(59,130,246,.08)}
+.feedback-box{background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:16px;display:none;flex-direction:column;gap:10px}
+.feedback-title{font-weight:700;font-size:1.1rem}
+.feedback-title.correct{color:#22c55e}
+.feedback-title.incorrect{color:var(--red-accent)}
+.feedback-desc{font-size:.95rem;color:var(--text-muted);line-height:1.4}
+#rankup-modal{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(10,12,16,.92);display:none;flex-direction:column;justify-content:center;align-items:center;z-index:1000;padding:24px;text-align:center;backdrop-filter:blur(8px)}
+.rankup-glow-box{background:var(--bg-panel);border:2px solid var(--blue-accent);border-radius:16px;padding:30px 20px;display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:360px;box-shadow:0 0 50px var(--blue-glow)}
+.rankup-title{font-size:2.2rem;font-weight:700;color:var(--blue-accent);letter-spacing:3px;text-shadow:0 0 15px var(--blue-glow)}
+.rankup-subtitle{font-size:1.1rem;color:var(--text-muted);letter-spacing:1px}
+#backup-modal{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(10,12,16,.95);display:none;flex-direction:column;justify-content:center;align-items:center;z-index:1100;padding:18px;backdrop-filter:blur(8px)}
+.backup-box{background:var(--bg-panel);border:1px solid var(--border-color);border-radius:12px;padding:18px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:8px;max-height:90%;overflow-y:auto}
+.backup-label{font-size:.78rem;font-weight:700;letter-spacing:1.5px;color:var(--text-muted)}
+.backup-area{width:100%;height:88px;background:var(--bg-base);border:1px solid var(--border-color);border-radius:6px;color:var(--text-main);font-family:monospace;font-size:.72rem;padding:8px;resize:none;outline:none;word-break:break-all}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg-base)}::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:2px}
+</style>
+</head>
+<body>
+<div id="game-container">
+  <header>
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 512 512" aria-hidden="true">
+        <polygon points="256,88 401,172 401,340 256,424 111,340 111,172" fill="none" stroke="#3b82f6" stroke-width="18"/>
+        <path d="M171 156L256 356L341 156" fill="none" stroke="#f8fafc" stroke-width="30"/>
+        <path d="M212 226H300" fill="none" stroke="#f8fafc" stroke-width="30"/>
+      </svg>
+      <span>APEX // OS</span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="openBackup()">BACKUP</button>
+      <button class="icon-btn" onclick="resetGamePrompt()">RESET</button>
+    </div>
+  </header>
+
+  <div id="tab-katawan" class="view-content active">
+    <div class="rank-section">
+      <div class="badge-container"><div id="central-badge" class="badge badge-dot"></div></div>
+      <div id="rank-name" class="rank-title" style="color:#64748b;">HUMAN</div>
+      <div id="rank-threshold-desc" class="rank-desc">0 TOTAL POINTS</div>
+    </div>
+    <div class="progress-container">
+      <div class="progress-info"><span id="prog-current-rank">HUMAN</span><span id="prog-next-target">NEXT: 10 PTS</span></div>
+      <div class="progress-bar-bg"><div id="progress-fill" class="progress-bar-fill"></div></div>
+    </div>
+    <div class="score-display-card">
+      <div class="score-label">TOTAL ACCUMULATED REPS</div>
+      <div id="score-display" class="score-number">0</div>
+      <div class="reps-grid" style="margin-bottom:12px;">
+        <button class="rep-btn" onclick="addReps(1)">+1</button>
+        <button class="rep-btn" onclick="addReps(10)">+10</button>
+        <button class="rep-btn" onclick="addReps(100)">+100</button>
+        <button class="rep-btn" onclick="addReps(1000)">+1K</button>
+      </div>
+      <div class="custom-rep-box">
+        <input type="number" id="custom-rep-input" class="custom-input" placeholder="Custom reps..." min="1">
+        <button class="custom-submit" onclick="addCustomReps()">LOG</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-utak" class="view-content">
+    <div class="utak-header">
+      <div id="utak-mode-label" class="utak-mode-title">MODE A: ARALIN</div>
+      <div id="utak-rank-status" style="font-size:.85rem;color:var(--text-muted);font-weight:600;">RANK: HUMAN</div>
+    </div>
+    <div id="learning-container" style="display:flex;flex-direction:column;gap:16px;">
+      <div class="lesson-card">
+        <div id="lesson-branch" class="lesson-meta">PUNDASYON</div>
+        <div id="lesson-title" class="lesson-title">Naglo-load...</div>
+        <div id="lesson-body" class="lesson-body">Mag-ipon ng points para mag-unlock ng aralin.</div>
+        <button id="lesson-action-btn" class="action-btn" onclick="completeCurrentLesson()">TAPOS NA</button>
+      </div>
+    </div>
+    <div id="scenario-container" style="display:none;flex-direction:column;gap:16px;">
+      <div class="scenario-card">
+        <div class="lesson-meta">TACTICAL STRATEGY ENGINE</div>
+        <div id="scenario-text" class="scenario-text">Naglo-load...</div>
+        <div id="options-box" class="options-container"></div>
+        <div id="feedback-box" class="feedback-box">
+          <div id="feedback-title" class="feedback-title"></div>
+          <div id="feedback-desc" class="feedback-desc"></div>
+          <button class="action-btn" onclick="nextScenario()">SUSUNOD NA SCENARIO</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav>
+    <button class="nav-tab active" onclick="switchTab('katawan')"><span>KATAWAN</span></button>
+    <button class="nav-tab" onclick="switchTab('utak')"><span>UTAK</span></button>
+  </nav>
+
+  <div id="rankup-modal">
+    <div class="rankup-glow-box">
+      <div class="rankup-title">RANK UP!</div>
+      <div id="rankup-msg" class="rankup-subtitle"></div>
+      <button class="action-btn" style="width:100%;margin-top:10px;" onclick="closeRankUpModal()">TULOY</button>
+    </div>
+  </div>
+
+  <div id="backup-modal">
+    <div class="backup-box">
+      <div class="backup-label">BACKUP // EXPORT</div>
+      <textarea id="export-area" class="backup-area" readonly></textarea>
+      <button class="action-btn" onclick="copyExport()">KOPYAHIN</button>
+      <div class="backup-label" style="margin-top:8px;">RESTORE // IMPORT</div>
+      <textarea id="import-area" class="backup-area" placeholder="I-paste dito ang backup code..."></textarea>
+      <button class="action-btn" onclick="doImport()">I-RESTORE</button>
+      <button class="icon-btn" style="width:100%;padding:10px;" onclick="closeBackup()">ISARA</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const RANKS = [
+  { name: "Human", threshold: 0, color: "#64748b", badgeClass: "badge-dot" },
+  { name: "F", threshold: 10, color: "#3b82f6", badgeClass: "badge-hexagon" },
+  { name: "D", threshold: 100, color: "#2563eb", badgeClass: "badge-ringed-hex" },
+  { name: "C", threshold: 1000, color: "#1d4ed8", badgeClass: "badge-shield" },
+  { name: "B", threshold: 10000, color: "#06b6d4", badgeClass: "badge-glowing-shield" },
+  { name: "A", threshold: 100000, color: "#dc2626", badgeClass: "badge-winged-shield" },
+  { name: "S", threshold: 1000000, color: "#ef4444", badgeClass: "badge-crowned" },
+  { name: "SS", threshold: 10000000, color: "#8b5cf6", badgeClass: "badge-aura" },
+  { name: "SSS", threshold: 100000000, color: "#7c3aed", badgeClass: "badge-animated-aura" },
+  { name: "FINAL", threshold: 1000000000, color: "#c084fc", badgeClass: "badge-ultimate", symbol: "\u2200" }
+];
+
+const LESSONS = [
+  { rankIndex: 1, branch: "Pundasyon ng sikolohiya", book: "Thinking Fast and Slow", title: "Dalawang Sistema ng Isip", body: "Ang isip ay may dalawang makina: ang System 1 na mabilis, awtomatiko, at madamdamin, at ang System 2 na mabagal, pagod, at lohikal. Halos lahat ng desisyon mo sa isang araw ay gawa ng System 1. Kaya ang unang hakbang sa dark psychology ay malaman kung aling makina ang kausap mo." },
+  { rankIndex: 1, branch: "Pundasyon ng sikolohiya", book: "Thinking Fast and Slow", title: "Pangyayari, Interpretasyon, Reaksyon", body: "Hindi ang pangyayari ang gumagawa ng emosyon mo kundi ang interpretasyon mo dito. Sa pagitan ng nangyari at ng naramdaman mo, may isang hakbang na pwedeng baguhin. Kung kontrolado mo ang interpretasyon, kontrolado mo ang reaksyon." },
+  { rankIndex: 1, branch: "Pundasyon ng sikolohiya", book: "The Laws of Human Nature", title: "Tatlong Pangangailangan", body: "Lahat ng tao ay naghahanap ng tatlo: pagiging kabilang, pagiging mahalaga, at pagiging kontrolado ng sariling buhay. Kapag nakita mo kung alin sa tatlo ang kulang sa isang tao, nakita mo na rin ang butas kung saan siya pwedeng abutin. Ang pangangailangan ang unang target, hindi ang argumento." },
+  { rankIndex: 1, branch: "Pundasyon ng sikolohiya", book: "Dark Psychology and Manipulation", title: "Emosyon ay
